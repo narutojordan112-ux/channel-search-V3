@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>2026 稅務策略專家系統</title>
+    <title>2026 專業稅務配置系統 (個人/法人雙模組)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -11,11 +11,9 @@
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap');
         body { font-family: 'Noto Sans TC', sans-serif; -webkit-tap-highlight-color: transparent; }
         .tab-active { background-color: #4f46e5 !important; color: white !important; box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.3); }
-        input[type="number"] { font-size: 16px !important; transition: all 0.2s; }
-        input[type="number"]:focus { border-color: #4f46e5; background-color: white; }
+        input[type="text"] { font-size: 16px !important; transition: all 0.2s; border-width: 2px; }
+        input[type="text"]:focus { border-color: #4f46e5; background-color: white; outline: none; }
         .card { background-color: white; border-radius: 1.5rem; border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,0.1); padding: 1.5rem; }
-        /* 隱藏 Chrome/Safari 的 input 箭頭 */
-        input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
     </style>
 </head>
 <body class="bg-slate-50 min-h-screen">
@@ -25,33 +23,36 @@
             <div class="p-6 border-b border-slate-800">
                 <div class="flex items-center gap-3">
                     <div class="w-10 h-10 bg-indigo-500 rounded-xl flex items-center justify-center">
-                        <i data-lucide="shield-check" class="w-6 h-6"></i>
+                        <i data-lucide="split" class="w-6 h-6"></i>
                     </div>
                     <div>
-                        <h1 class="text-lg font-black tracking-tight">稅務策略專家</h1>
-                        <p class="text-[10px] text-slate-400 uppercase tracking-widest">Strategy v2026.FINAL</p>
+                        <h1 class="text-lg font-black tracking-tight">稅務策略分析</h1>
+                        <p class="text-[10px] text-slate-400 uppercase tracking-widest">Double-Track v2026</p>
                     </div>
                 </div>
             </div>
             
             <nav class="p-4 space-y-2 flex-1 overflow-x-auto lg:overflow-x-visible flex lg:flex-col gap-2 lg:gap-0">
+                <div class="text-[10px] font-bold text-slate-500 px-4 py-2 uppercase tracking-widest hidden lg:block">個人資產配置</div>
                 <button onclick="switchTab('individual')" id="btn-individual" class="tab-btn w-full flex items-center p-4 rounded-2xl transition-all gap-4 shrink-0 lg:shrink text-slate-400">
-                    <i data-lucide="user" class="w-5 h-5"></i> <span class="font-bold text-sm">個人與 AMT</span>
+                    <i data-lucide="user" class="w-5 h-5"></i> <span class="font-bold text-sm">個人所得與 AMT</span>
                 </button>
                 <button onclick="switchTab('estate')" id="btn-estate" class="tab-btn w-full flex items-center p-4 rounded-2xl transition-all gap-4 shrink-0 lg:shrink text-slate-400">
-                    <i data-lucide="heart" class="w-5 h-5"></i> <span class="font-bold text-sm">遺產規劃</span>
+                    <i data-lucide="heart" class="w-5 h-5"></i> <span class="font-bold text-sm">遺產規劃試算</span>
                 </button>
-                <button onclick="switchTab('gift')" id="btn-gift" class="tab-btn w-full flex items-center p-4 rounded-2xl transition-all gap-4 shrink-0 lg:shrink text-slate-400">
-                    <i data-lucide="gift" class="w-5 h-5"></i> <span class="font-bold text-sm">贈與試算</span>
+                
+                <div class="text-[10px] font-bold text-slate-500 px-4 py-2 mt-4 uppercase tracking-widest hidden lg:block border-t border-slate-800 pt-6">法人帳戶配置</div>
+                <button onclick="switchTab('corporate')" id="btn-corporate" class="tab-btn w-full flex items-center p-4 rounded-2xl transition-all gap-4 shrink-0 lg:shrink text-slate-400">
+                    <i data-lucide="building" class="w-5 h-5"></i> <span class="font-bold text-sm">營所稅與 MAT</span>
                 </button>
             </nav>
 
             <div class="p-6 border-t border-slate-800 hidden lg:block bg-slate-900/50">
-                <p class="text-[10px] font-bold text-indigo-400 uppercase mb-2">2026 法律參數檢核</p>
+                <p class="text-[10px] font-bold text-indigo-400 uppercase mb-2">配置邏輯提醒</p>
                 <ul class="text-[10px] text-slate-400 space-y-1">
-                    <li>• AMT 免稅額：750 萬 ✅</li>
-                    <li>• 保險門檻：3,740 萬 ✅</li>
-                    <li>• 贈與免稅額：244 萬 ✅</li>
+                    <li>• 個人 AMT：20% (免稅 750萬)</li>
+                    <li>• 法人 MAT：12% (免稅 60萬)</li>
+                    <li>• 目標：極小化雙邊最終稅額</li>
                 </ul>
             </div>
         </aside>
@@ -60,7 +61,7 @@
             <div class="flex-1 p-6 lg:p-10 overflow-y-auto">
                 <div class="max-w-xl mx-auto space-y-8">
                     <div id="module-head">
-                        <h2 id="m-title" class="text-2xl font-black text-slate-900 leading-tight"></h2>
+                        <h2 id="m-title" class="text-2xl font-black text-slate-900 leading-tight">載入中...</h2>
                         <p id="m-desc" class="text-slate-500 text-sm italic mt-1"></p>
                     </div>
 
@@ -71,7 +72,7 @@
 
             <div class="w-full lg:w-96 bg-white border-t lg:border-t-0 lg:border-l border-slate-200 p-8 lg:p-10 shrink-0 shadow-2xl">
                 <h3 class="text-lg font-black text-slate-900 mb-6 flex items-center gap-2">
-                    <i data-lucide="pie-chart" class="w-5 h-5 text-indigo-600"></i> 策略分析
+                    <i data-lucide="bar-chart-3" class="w-5 h-5 text-indigo-600"></i> 配置效能分析
                 </h3>
                 
                 <div class="space-y-6">
@@ -85,19 +86,18 @@
                             <span id="res-base" class="font-mono font-bold text-slate-900">NT$ 0</span>
                         </div>
                         <div class="flex justify-between items-center">
-                            <span class="text-slate-500 font-medium text-xs">總免稅額度</span>
+                            <span id="label-exempt" class="text-slate-500 font-medium text-xs">免稅額度</span>
                             <span id="res-exempt" class="font-mono font-bold text-green-600">NT$ 0</span>
                         </div>
                     </div>
 
                     <div class="bg-indigo-600 p-8 rounded-[2.5rem] text-white shadow-xl shadow-indigo-100 relative overflow-hidden">
-                        <div class="absolute -right-4 -top-4 w-20 h-20 bg-white/10 rounded-full blur-2xl"></div>
-                        <p class="text-indigo-200 text-[10px] font-bold uppercase tracking-widest mb-1">最終應納稅額</p>
+                        <p id="label-final-tax" class="text-indigo-200 text-[10px] font-bold uppercase tracking-widest mb-1">應納稅額 (取大者)</p>
                         <p id="res-tax" class="text-4xl font-black font-mono tracking-tighter">NT$ 0</p>
                     </div>
 
                     <div class="space-y-3">
-                        <h4 class="text-[10px] font-black text-slate-400 uppercase tracking-widest">理專策略摘要</h4>
+                        <h4 class="text-[10px] font-black text-slate-400 uppercase tracking-widest">配置建議</h4>
                         <div id="expert-note" class="p-5 bg-slate-50 rounded-2xl text-[11px] leading-relaxed text-slate-600 border border-slate-100 italic">
                         </div>
                     </div>
@@ -110,16 +110,31 @@
         let currentTab = 'individual';
         let taxChart = null;
 
-        // 2026 精準法律參數
         const CONFIG = {
-            AMT_EXEMPT: 7500000,
-            INSURANCE_THRESHOLD: 37400000,
-            GIFT_EXEMPT: 2440000,
-            ESTATE_BASE: 13330000
+            IND_AMT_EXEMPT: 7500000,
+            CORP_MAT_EXEMPT: 600000,
+            CORP_RATE: 0.20,
+            CORP_MAT_RATE: 0.12
         };
 
-        // 初始化圖示
         lucide.createIcons();
+
+        function formatNumberWithComma(str) {
+            let num = str.toString().replace(/,/g, '');
+            if (isNaN(num) || num === "") return "";
+            return Number(num).toLocaleString('en-US');
+        }
+
+        function handleInput(el) {
+            let rawVal = el.value.replace(/,/g, '');
+            el.value = rawVal === "" ? "" : formatNumberWithComma(rawVal);
+            calculate();
+        }
+
+        function getRawValue(id) {
+            const el = document.getElementById(id);
+            return el ? parseFloat(el.value.replace(/,/g, '')) || 0 : 0;
+        }
 
         function switchTab(tabId) {
             currentTab = tabId;
@@ -135,54 +150,37 @@
             const desc = document.getElementById('m-desc');
 
             if (currentTab === 'individual') {
-                title.innerText = "個人綜合所得與 AMT 分析";
-                desc.innerText = "彙整海外、保險與證券所得進行雙軌試算";
+                title.innerText = "個人所得與 AMT 分析";
+                desc.innerText = "計算個人帳戶投資之稅賦影響";
                 form.innerHTML = `
                     <div class="card space-y-6">
                         <div>
                             <label class="block text-[10px] font-bold text-slate-400 mb-2 uppercase tracking-wide">綜合所得淨額</label>
-                            <input type="number" id="in-net" value="2000000" oninput="calculate()" class="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl outline-none font-bold focus:border-indigo-500">
+                            <input type="text" id="ind-net" value="2,000,000" oninput="handleInput(this)" class="w-full p-4 bg-slate-50 border-slate-100 rounded-2xl font-bold">
                         </div>
                         <div>
-                            <label class="block text-[10px] font-bold text-slate-400 mb-2 uppercase tracking-wide">海外所得 (含港澳 / CFC)</label>
-                            <input type="number" id="in-overseas" value="0" oninput="calculate()" class="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl outline-none font-bold focus:border-amber-500">
-                            <p class="text-[9px] text-slate-400 mt-1">合計達 100 萬需全額計入 AMT</p>
+                            <label class="block text-[10px] font-bold text-slate-400 mb-2 uppercase tracking-wide">海外/特定投資所得 (AMT項目)</label>
+                            <input type="text" id="ind-overseas" value="0" oninput="handleInput(this)" class="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl font-bold focus:border-amber-500 outline-none">
                         </div>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-slate-50">
-                            <div>
-                                <label class="block text-[10px] font-bold text-slate-400 mb-2 uppercase tracking-wide">未上市股票增益</label>
-                                <input type="number" id="in-unlisted" value="0" oninput="calculate()" class="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-xl outline-none font-bold">
-                            </div>
-                            <div>
-                                <label class="block text-[10px] font-bold text-slate-400 mb-2 uppercase tracking-wide">壽險死亡給付額</label>
-                                <input type="number" id="in-insur" value="0" oninput="calculate()" class="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-xl outline-none font-bold">
-                            </div>
+                    </div>`;
+            } else if (currentTab === 'corporate') {
+                title.innerText = "法人營所稅與 MAT 分析";
+                desc.innerText = "計算公司戶投資之稅賦影響 (稅率 20% vs 12%)";
+                form.innerHTML = `
+                    <div class="card space-y-6">
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-400 mb-2 uppercase tracking-wide">營利事業課稅所得額</label>
+                            <input type="text" id="corp-net" value="2,000,000" oninput="handleInput(this)" class="w-full p-4 bg-slate-50 border-slate-100 rounded-2xl font-bold focus:border-indigo-500 outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-400 mb-2 uppercase tracking-wide">免稅所得 (證券交易/海外所得等)</label>
+                            <input type="text" id="corp-exempt-inc" value="0" oninput="handleInput(this)" class="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl font-bold focus:border-amber-500 outline-none">
                         </div>
                     </div>`;
             } else if (currentTab === 'estate') {
-                title.innerText = "遺產規劃與扣除額試算";
-                desc.innerText = "評估遺產總額與繼承人配置之稅務負擔";
-                form.innerHTML = `
-                    <div class="card space-y-6">
-                        <div>
-                            <label class="block text-[10px] font-bold text-slate-400 mb-2 uppercase tracking-wide">預估遺產總額</label>
-                            <input type="number" id="in-estate-total" value="20000000" oninput="calculate()" class="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl outline-none font-bold focus:border-indigo-500">
-                        </div>
-                        <div>
-                            <label class="block text-[10px] font-bold text-slate-400 mb-2 uppercase tracking-wide">直系親屬人數 (含配偶/子女)</label>
-                            <input type="number" id="in-heirs" value="2" oninput="calculate()" class="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl outline-none font-bold">
-                        </div>
-                    </div>`;
-            } else if (currentTab === 'gift') {
-                title.innerText = "年度贈與稅額評估";
-                desc.innerText = "利用每年 244 萬免稅額進行資產分流";
-                form.innerHTML = `
-                    <div class="card space-y-6">
-                        <div>
-                            <label class="block text-[10px] font-bold text-slate-400 mb-2 uppercase tracking-wide">本次贈與總額</label>
-                            <input type="number" id="in-gift-total" value="5000000" oninput="calculate()" class="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl outline-none font-bold focus:border-indigo-500">
-                        </div>
-                    </div>`;
+                title.innerText = "遺產與傳承規劃";
+                desc.innerText = "評估長期資產配置對遺產稅之影響";
+                form.innerHTML = `<div class="card p-10 text-center text-slate-400 text-sm">請輸入資產總額進行傳承分析...</div>`;
             }
         }
 
@@ -190,51 +188,34 @@
             let finalTax = 0, base = 0, exempt = 0, chartVals = [0, 0], note = "";
 
             if (currentTab === 'individual') {
-                const net = Math.max(0, parseFloat(document.getElementById('in-net').value) || 0);
-                const overseas = Math.max(0, parseFloat(document.getElementById('in-overseas').value) || 0);
-                const unlisted = Math.max(0, parseFloat(document.getElementById('in-unlisted').value) || 0);
-                const insur = Math.max(0, parseFloat(document.getElementById('in-insur').value) || 0);
-
-                // 1. 一般所得稅額 (2026 級距)
-                let regTax = 0;
-                if (net <= 590000) regTax = net * 0.05;
-                else if (net <= 1330000) regTax = net * 0.12 - 41300;
-                else if (net <= 2660000) regTax = net * 0.20 - 147700;
-                else if (net <= 4980000) regTax = net * 0.30 - 413700;
-                else regTax = net * 0.40 - 911700;
-
-                // 2. 基本稅額 (AMT)
-                // 基本所得額 = 一般淨額 + 海外(需>=100萬) + 未上市股票 + 保險(扣除3740萬)
-                let amtIncome = net + (overseas >= 1000000 ? overseas : 0) + unlisted + Math.max(0, insur - CONFIG.INSURANCE_THRESHOLD);
-                let amtTax = Math.max(0, (amtIncome - CONFIG.AMT_EXEMPT) * 0.20);
+                const net = getRawValue('ind-net');
+                const overseas = getRawValue('ind-overseas');
+                
+                let regTax = net <= 590000 ? net * 0.05 : (net <= 1330000 ? net * 0.12 - 41300 : (net <= 2660000 ? net * 0.20 - 147700 : net * 0.30 - 413700));
+                let amtIncome = net + (overseas >= 1000000 ? overseas : 0);
+                let amtTax = Math.max(0, (amtIncome - CONFIG.IND_AMT_EXEMPT) * 0.20);
                 
                 finalTax = Math.max(regTax, amtTax);
                 base = amtIncome;
-                exempt = CONFIG.AMT_EXEMPT;
+                exempt = CONFIG.IND_AMT_EXEMPT;
                 chartVals = [regTax, amtTax];
-                note = amtTax > regTax ? 
-                    `⚠️ <strong>AMT 預警：</strong>基本稅額已成為主導稅額。客戶正承受 20% 的固定邊際稅率，應評估海外資產收益是否轉向國內免稅產品。` : 
-                    `✅ <strong>門檻安全：</strong>目前所得配置尚在 750 萬門檻內。海外及特定所得還有約 NT$ ${Math.max(0, CONFIG.AMT_EXEMPT - (amtIncome - net)).toLocaleString()} 的規劃空間。`;
+                note = amtTax > regTax ? `⚠️ 個人戶已觸發 AMT。投資超過 750 萬部分將實課 20% 稅率。` : `✅ 個人戶免稅額剩餘約 ${(CONFIG.IND_AMT_EXEMPT - (amtIncome - net)).toLocaleString()} 元。`;
 
-            } else if (currentTab === 'estate') {
-                const total = Math.max(0, parseFloat(document.getElementById('in-estate-total').value) || 0);
-                const heirs = Math.max(0, parseFloat(document.getElementById('in-heirs').value) || 0);
-                // 簡化模型：免稅額 1333 + 扣除額 (約 553 + 56*N + 137)
-                exempt = CONFIG.ESTATE_BASE + 5530000 + (heirs * 560000) + 137000;
-                let netEst = Math.max(0, total - exempt);
-                finalTax = netEst <= 50000000 ? netEst * 0.10 : (netEst <= 100000000 ? netEst * 0.15 - 2500000 : netEst * 0.20 - 7500000);
-                base = total;
-                chartVals = [total, exempt];
-                note = finalTax > 0 ? `預估淨遺產為 ${Math.floor(netEst).toLocaleString()}。建議利用每人每年 244 萬免稅額進行分年贈與轉移。` : "資產總額尚在免稅與扣除額門檻內，暫無遺產稅壓力。";
-
-            } else if (currentTab === 'gift') {
-                const total = Math.max(0, parseFloat(document.getElementById('in-gift-total').value) || 0);
-                exempt = CONFIG.GIFT_EXEMPT;
-                let netGift = Math.max(0, total - exempt);
-                finalTax = netGift <= 25000000 ? netGift * 0.10 : (netGift <= 50000000 ? netGift * 0.15 - 1250000 : netGift * 0.20 - 3750000);
-                base = total;
-                chartVals = [total, exempt];
-                note = `年度免稅額為 244 萬。本次贈與預估稅額為 NT$ ${Math.floor(finalTax).toLocaleString()}。建議評估分年度或分受贈人進行規劃。`;
+            } else if (currentTab === 'corporate') {
+                const net = getRawValue('corp-net');
+                const exemptInc = getRawValue('corp-exempt-inc');
+                
+                // 一般營所稅 20%
+                let regTax = net * CONFIG.CORP_RATE;
+                // 基本稅額 (MAT) 12%
+                let matIncome = net + exemptInc;
+                let matTax = Math.max(0, (matIncome - CONFIG.CORP_MAT_EXEMPT) * CONFIG.CORP_MAT_RATE);
+                
+                finalTax = Math.max(regTax, matTax);
+                base = matIncome;
+                exempt = CONFIG.CORP_MAT_EXEMPT;
+                chartVals = [regTax, matTax];
+                note = matTax > regTax ? `⚠️ 公司戶觸發 MAT (12%)。建議與個人戶之 20% 稅率進行跨帳戶比對。` : `✅ 公司戶目前僅課徵 20% 營所稅。`;
             }
 
             updateUI(finalTax, base, exempt, chartVals, note);
@@ -245,35 +226,24 @@
             document.getElementById('res-base').innerText = 'NT$ ' + Math.floor(base).toLocaleString();
             document.getElementById('res-exempt').innerText = 'NT$ ' + Math.floor(exempt).toLocaleString();
             document.getElementById('expert-note').innerHTML = note;
-            updateChart(chartVals);
-        }
-
-        function updateChart(data) {
+            
             const ctx = document.getElementById('taxChart').getContext('2d');
             if (taxChart) taxChart.destroy();
             taxChart = new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: currentTab === 'individual' ? ['一般所得', 'AMT 基本稅'] : ['總資產/贈與', '免稅/扣除額'],
+                    labels: currentTab === 'individual' ? ['綜所稅', 'AMT'] : ['營所稅', 'MAT'],
                     datasets: [{
-                        data: data,
+                        data: chartVals,
                         backgroundColor: ['#e2e8f0', '#4f46e5'],
-                        borderRadius: 10,
-                        barThickness: 35
+                        borderRadius: 10, barThickness: 35
                     }]
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: { y: { display: false }, x: { grid: { display: false }, ticks: { font: { size: 9 } } } }
-                }
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { grid: { display: false } } } }
             });
         }
 
-        window.onload = () => {
-            switchTab('individual');
-        };
+        window.onload = () => switchTab('individual');
     </script>
 </body>
 </html>
